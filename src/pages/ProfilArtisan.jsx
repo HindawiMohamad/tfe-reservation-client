@@ -10,7 +10,21 @@ function ProfilArtisan() {
       heureFin: ""
     });
     
-
+    const supprimerDispo = async (index) => {
+        try {
+          const nouvellesDispos = [...disponibilites];
+          nouvellesDispos.splice(index, 1); // on enlève celle qu'on veut
+      
+          const res = await axios.put(`http://localhost:5000/api/artisans/${artisan._id}`, {
+            disponibilites: nouvellesDispos
+          });
+      
+          setDisponibilites(res.data.disponibilites);
+        } catch (err) {
+          console.error("Erreur suppression dispo :", err);
+        }
+      };
+      
 
   const [artisan, setArtisan] = useState(null);
 
@@ -69,6 +83,9 @@ function ProfilArtisan() {
   {disponibilites.map((d, index) => (
     <li key={index}>
       {d.jour} de {d.heureDebut} à {d.heureFin}
+      <button onClick={() => supprimerDispo(index)} style={{ marginLeft: "1rem", color: "red" }}>
+        Supprimer
+      </button>
     </li>
   ))}
 </ul>
