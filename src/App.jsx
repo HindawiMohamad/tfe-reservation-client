@@ -7,6 +7,8 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import ProfilArtisan from "./pages/ProfilArtisan";
 import MesReservations from "./pages/MesReservations";
+import JeSuisArtisan from "./pages/JeSuisArtisan";
+
 
 function App() {
   return (
@@ -19,7 +21,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/profil" element={<ProfilArtisan />} />
-        <Route path="/mes-reservations" element={<MesReservations />} />
+        <Route path="/mes-reservations" element={<MesReservations />} />      
+        <Route path="/artisan" element={<JeSuisArtisan />} />
       </Routes>
     </Router>
   );

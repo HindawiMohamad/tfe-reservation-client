@@ -8,16 +8,28 @@ function Navbar() {
       <Link to="/" style={{ marginRight: "1rem" }}>Accueil</Link>
       <Link to="/artisans" style={{ marginRight: "1rem" }}>Artisans</Link>
       {artisan ? (
-        <>
-          <Link to="/profil" style={{ marginRight: "1rem" }}>Mon profil</Link>
-          <Link to="/mes-reservations">Mes réservations</Link>
-        </>
-      ) : (
-        <>
-          <Link to="/login" style={{ marginRight: "1rem" }}>Connexion</Link>
-          <Link to="/register">Inscription</Link>
-        </>
-      )}
+  <>
+    <Link to="/profil" style={{ marginRight: "1rem" }}>Mon profil</Link>
+    <Link to="/mes-reservations" style={{ marginRight: "1rem" }}>Mes réservations</Link>
+    <button
+      onClick={() => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("artisan");
+        window.location.href = "/";
+      }}
+      style={{ background: "none", border: "none", color: "red", cursor: "pointer" }}
+    >
+      Se déconnecter
+    </button>
+  </>
+) : (
+  <>
+<Link to="/artisan" style={{ marginRight: "1rem", fontWeight: "bold" }}>
+  Je suis artisan
+</Link>
+  </>
+)}
+
     </nav>
   );
 }
