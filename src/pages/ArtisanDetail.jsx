@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+import { Link } from "react-router-dom";
+
 
 function ArtisanDetail() {
   const { id } = useParams();
@@ -81,11 +83,28 @@ function ArtisanDetail() {
 
   return (
     <div style={{ padding: "1rem" }}>
+     <Link to="/artisans">
+             <button style={{ marginBottom: "1rem" }}>← Retour à la liste</button>
+      </Link>
       <h2>{artisan.nom}</h2>
       <p><strong>Métier :</strong> {artisan.métier}</p>
       <p><strong>Ville :</strong> {artisan.ville}</p>
       <p><strong>Téléphone :</strong> {artisan.téléphone}</p>
       <p><strong>Description :</strong> {artisan.description}</p>
+
+      {artisan.photos && artisan.photos.length > 0 && (
+        <div>
+          <h3>Photos de ses interventions 📸</h3>
+          {artisan.photos.map((photoUrl, index) => (
+            <img
+              key={index}
+              src={`http://localhost:5000${photoUrl}`}
+              alt="Intervention artisan"
+              style={{ width: "200px", marginRight: "10px", marginBottom: "10px" }}
+            />
+          ))}
+        </div>
+      )}
 
       <hr />
 
