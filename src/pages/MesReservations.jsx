@@ -62,26 +62,7 @@ function MesReservations() {
               <p><strong>Message :</strong> {r.message}</p>
 
               {estPasse ? (
-                <div style={{ marginTop: "1rem" }}>
-                  <h4>Laisser un avis ⭐</h4>
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    placeholder="Note sur 5"
-                    value={avisForm[r._id]?.note || ""}
-                    onChange={(e) => handleAvisChange(r._id, "note", e.target.value)}
-                    required
-                  /><br /><br />
-
-                  <textarea
-                    placeholder="Commentaire (optionnel)"
-                    value={avisForm[r._id]?.commentaire || ""}
-                    onChange={(e) => handleAvisChange(r._id, "commentaire", e.target.value)}
-                  /><br /><br />
-
-                  <button onClick={() => envoyerAvis(r._id, r.artisan_id)}>Envoyer l'avis</button>
-                </div>
+                <p style={{ color: "black" }}>⚫ Le rendez-vous est cloturé, vous pouvez voir la note du client sur votre profil</p>
               ) : (
                 <p style={{ color: "gray" }}>🕒 Le rendez-vous n'a pas encore eu lieu</p>
               )}

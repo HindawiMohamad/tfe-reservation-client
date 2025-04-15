@@ -1,35 +1,42 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 function Navbar() {
   const artisan = JSON.parse(localStorage.getItem("artisan"));
+  const [open, setOpen] = useState(false);
 
   return (
-    <nav style={{ background: "#eee", padding: "1rem" }}>
-      <Link to="/" style={{ marginRight: "1rem" }}>Accueil</Link>
-      <Link to="/artisans" style={{ marginRight: "1rem" }}>Artisans</Link>
-      {artisan ? (
-  <>
-    <Link to="/profil" style={{ marginRight: "1rem" }}>Mon profil</Link>
-    <Link to="/mes-reservations" style={{ marginRight: "1rem" }}>Mes réservations</Link>
-    <button
-      onClick={() => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("artisan");
-        window.location.href = "/";
-      }}
-      style={{ background: "none", border: "none", color: "red", cursor: "pointer" }}
-    >
-      Se déconnecter
-    </button>
-  </>
-) : (
-  <>
-<Link to="/artisan" style={{ marginRight: "1rem", fontWeight: "bold" }}>
-  Je suis artisan
-</Link>
-  </>
-)}
+    <nav className="navbar">
+      <div className="navbar-left">
+        <Link to="/" className="logo">ArtisanConnect</Link>
+        
 
+        <button className="burger" onClick={() => setOpen(!open)}>
+          ☰
+        </button>
+      </div>
+
+      <div className={`navbar-right ${open ? "open" : ""}`}>
+        <Link to="/">Accueil</Link>
+        <Link to="/about">Qui sommes-nous ?</Link>
+        <Link to="/artisans">Nos Artisans</Link>
+
+        {artisan ? (
+          <>
+            <Link to="/profil">Mon profil</Link>
+            <Link to="/mes-reservations">Mes réservations</Link>
+            <Link to="/"><button onClick={() => {
+              localStorage.removeItem("token");
+              localStorage.removeItem("artisan");
+              window.location.href = "/";
+            }}>
+              Se déconnecter
+            </button></Link>
+          </>
+        ) : (
+          <Link to="/artisan">Je suis artisan</Link>
+        )}
+      </div>
     </nav>
   );
 }

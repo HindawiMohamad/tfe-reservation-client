@@ -86,14 +86,15 @@ function ProfilArtisan() {
         <button type="submit">Ajouter</button>
       </form>
 
-      <ul>
-        {disponibilites.map((d, index) => (
-          <li key={index}>
-            {d.jour} de {d.heureDebut} à {d.heureFin}
-            <button onClick={() => supprimerDispo(index)} style={{ marginLeft: "1rem", color: "red" }}>Supprimer</button>
-          </li>
-        ))}
-      </ul>
+          {disponibilites.map((d, index) => (
+      <div key={index} className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span>{d.jour} de {d.heureDebut} à {d.heureFin}</span>
+        <button onClick={() => supprimerDispo(index)} style={{ background: "red", color: "white" }}>
+          Supprimer
+        </button>
+      </div>
+    ))}
+
 
       <hr />
 

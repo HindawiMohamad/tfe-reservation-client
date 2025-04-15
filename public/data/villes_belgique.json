@@ -1,0 +1,82 @@
+[
+  {
+    "ville": "Bruxelles",
+    "codePostal": "1000"
+  },
+  {
+    "ville": "Ixelles",
+    "codePostal": "1050"
+  },
+  {
+    "ville": "Anderlecht",
+    "codePostal": "1070"
+  },
+  {
+    "ville": "Schaerbeek",
+    "codePostal": "1030"
+  },
+  {
+    "ville": "Molenbeek-Saint-Jean",
+    "codePostal": "1080"
+  },
+  {
+    "ville": "Uccle",
+    "codePostal": "1180"
+  },
+  {
+    "ville": "Etterbeek",
+    "codePostal": "1040"
+  },
+  {
+    "ville": "Saint-Gilles",
+    "codePostal": "1060"
+  },
+  {
+    "ville": "Forest",
+    "codePostal": "1190"
+  },
+  {
+    "ville": "Woluwe-Saint-Lambert",
+    "codePostal": "1200"
+  },
+  {
+    "ville": "Woluwe-Saint-Pierre",
+    "codePostal": "1150"
+  },
+  {
+    "ville": "Evere",
+    "codePostal": "1140"
+  },
+  {
+    "ville": "Jette",
+    "codePostal": "1090"
+  },
+  {
+    "ville": "Koekelberg",
+    "codePostal": "1081"
+  },
+  {
+    "ville": "Berchem-Sainte-Agathe",
+    "codePostal": "1082"
+  },
+  {
+    "ville": "Ganshoren",
+    "codePostal": "1083"
+  },
+  {
+    "ville": "Laeken",
+    "codePostal": "1020"
+  },
+  {
+    "ville": "Haren",
+    "codePostal": "1130"
+  },
+  {
+    "ville": "Neder-Over-Heembeek",
+    "codePostal": "1120"
+  },
+  {
+    "ville": "Saint-Josse-ten-Noode",
+    "codePostal": "1210"
+  }
+]

@@ -1,13 +1,18 @@
+import "./Home.css";
 import { Link } from "react-router-dom";
 
 function Home() {
   return (
-    <div style={{ padding: "1rem" }}>
-      <h1>Bienvenue sur notre plateforme de réservation d’artisans 👷‍♂️</h1>
-      <p>Trouvez un artisan, réservez un rendez-vous, laissez un avis 💪</p>
-      <Link to="/artisans">
-        <button style={{ marginTop: "1rem" }}>Voir les artisans</button>
-      </Link>
+    <div className="home-container">
+      <div className="home-gradient">
+        <div className="home-content">
+          <h1>Bienvenue sur ArtisanConnect</h1>
+          <p>Trouvez un artisan de confiance, près de chez vous.</p>
+          <Link to="/artisans">
+            <button>Voir les artisans</button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

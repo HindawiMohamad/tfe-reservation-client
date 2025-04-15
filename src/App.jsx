@@ -8,7 +8,8 @@ import Login from "./pages/Login";
 import ProfilArtisan from "./pages/ProfilArtisan";
 import MesReservations from "./pages/MesReservations";
 import JeSuisArtisan from "./pages/JeSuisArtisan";
-
+import About from "./pages/About";
+import AvisRdv from "./pages/AvisRdv";
 
 function App() {
   return (
@@ -23,6 +24,9 @@ function App() {
         <Route path="/profil" element={<ProfilArtisan />} />
         <Route path="/mes-reservations" element={<MesReservations />} />      
         <Route path="/artisan" element={<JeSuisArtisan />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/avis/:id" element={<AvisRdv />} />
+
       </Routes>
     </Router>
   );

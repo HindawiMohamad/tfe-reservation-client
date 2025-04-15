@@ -6,8 +6,10 @@ function Artisans() {
   const [artisans, setArtisans] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
-  const [ville, setVille] = useState("");
+  const [codePostal, setCodePostal] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
   const [triNote, setTriNote] = useState(false);
+  const [villes, setVilles] = useState([]);
 
   useEffect(() => {
     axios.get("http://localhost:5000/api/artisans")
@@ -15,9 +17,30 @@ function Artisans() {
         setArtisans(res.data);
         setFiltered(res.data);
       })
-      .catch(err => console.error("Erreur API :", err));
+      .catch(err => console.error("Erreur API artisans :", err));
   }, []);
 
+  // Charger les villes depuis JSON
+  useEffect(() => {
+    fetch("/data/villes_belgique.json")
+      .then(res => res.json())
+      .then(data => setVilles(data))
+      .catch(err => console.error("Erreur chargement villes :", err));
+  }, []);
+
+  // Suggestions de ville en fonction du code postal
+  useEffect(() => {
+    if (codePostal.length >= 2) {
+      const match = villes.filter(v =>
+        v.codePostal.startsWith(codePostal)
+      );
+      setSuggestions(match);
+    } else {
+      setSuggestions([]);
+    }
+  }, [codePostal, villes]);
+
+  // Appliquer les filtres
   useEffect(() => {
     let result = [...artisans];
 
@@ -28,8 +51,9 @@ function Artisans() {
       );
     }
 
-    if (ville) {
-      result = result.filter(a => a.ville.toLowerCase() === ville.toLowerCase());
+    if (codePostal) {
+      const villesMatch = suggestions.map(s => s.ville.toLowerCase());
+      result = result.filter(a => villesMatch.includes(a.ville.toLowerCase()));
     }
 
     if (triNote) {
@@ -37,50 +61,72 @@ function Artisans() {
     }
 
     setFiltered(result);
-  }, [search, ville, triNote, artisans]);
+  }, [search, codePostal, triNote, artisans, suggestions]);
+
+  const handleSuggestionClick = (ville, code) => {
+    setCodePostal(code); // garde l’affichage du CP
+    setSuggestions([]);
+    // filtre se fait automatiquement
+  };
 
   return (
-    <div style={{ padding: "1rem" }}>
-      <h2>Nos artisans dispo 🧰</h2>
-
-      <input
-        type="text"
-        placeholder="Recherche par nom ou métier"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-
-      <select value={ville} onChange={(e) => setVille(e.target.value)}>
-        <option value="">Toutes les villes</option>
-        <option value="Bruxelles">Bruxelles</option>
-        <option value="Anderlecht">Anderlecht</option>
-        <option value="Ixelles">Ixelles</option>
-        <option value="Molenbeek">Molenbeek</option>
-        <option value="Schaerbeek">Schaerbeek</option>
-        <option value="Forest">Forest</option>
-      </select>
-
-      <label style={{ marginLeft: "1rem" }}>
+    <div style={{ padding: "1rem", margin:"100px 0" }}>
+      <div className="filters" style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center" }}>
         <input
-          type="checkbox"
-          checked={triNote}
-          onChange={(e) => setTriNote(e.target.checked)}
+          type="text"
+          placeholder="Recherche par nom ou métier"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
-        Trier par note ⭐
-      </label>
+
+        <input
+          type="text"
+          placeholder="Code postal"
+          value={codePostal}
+          onChange={(e) => setCodePostal(e.target.value)}
+        />
+
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <input
+            style={{ width: "35px" }}
+            type="checkbox"
+            checked={triNote}
+            onChange={(e) => setTriNote(e.target.checked)}
+          />
+          <label style={{ width: "250px" }}>
+            Trier par note ⭐
+          </label>
+        </div>
+      </div>
+
+      {/* Suggestions de ville */}
+      {suggestions.length > 0 && (
+        <ul style={{ listStyle: "none", paddingLeft: 0, marginTop: "0.5rem" }}>
+          {suggestions.map((v, i) => (
+            <li key={i}
+                onClick={() => handleSuggestionClick(v.ville, v.codePostal)}
+                style={{ cursor: "pointer", background: "#eee", padding: "0.5rem", marginBottom: "0.3rem" }}>
+              {v.codePostal} – {v.ville}
+            </li>
+          ))}
+        </ul>
+      )}
 
       <hr />
 
       {filtered.length === 0 ? (
         <p>Aucun artisan trouvé 🧐</p>
       ) : (
-        filtered.map(art => (
-          <div key={art._id} style={{ border: "1px solid #ccc", padding: "1rem", marginBottom: "1rem" }}>
+        filtered.map((art) => (
+          <div key={art._id} className="card">
             <h3>{art.nom}</h3>
             <p><strong>Métier :</strong> {art.métier}</p>
             <p><strong>Ville :</strong> {art.ville}</p>
             <p><strong>Note :</strong> {art.note_moyenne ? art.note_moyenne.toFixed(1) + " / 5" : "Pas encore noté"}</p>
-            <Link to={`/artisans/${art._id}`}>Voir le détail 🔍</Link>
+
+            <Link to={`/artisans/${art._id}`}>
+              <button style={{ marginTop: "0.5rem" }}>Profil de l'artisan</button>
+            </Link>
           </div>
         ))
       )}

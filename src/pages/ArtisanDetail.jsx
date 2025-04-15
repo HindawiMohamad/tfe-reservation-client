@@ -115,11 +115,12 @@ function ArtisanDetail() {
         <p>Aucun avis pour l’instant...</p>
       ) : (
         avis.map((a) => (
-          <div key={a._id} style={{ background: "#f9f9f9", padding: "0.5rem", margin: "0.5rem 0" }}>
+          <div key={a._id} className="card">
             <p><strong>Note :</strong> {a.note} / 5</p>
             <p><strong>Commentaire :</strong> {a.commentaire || "Pas de message"}</p>
           </div>
         ))
+        
       )}
 
       <hr />
