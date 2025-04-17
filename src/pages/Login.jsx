@@ -1,8 +1,18 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import axios from "axios";
+
 
 function Login() {
   const [formData, setFormData] = useState({ email: "", mot_de_passe: "" });
+
+useEffect(() => {
+  const dejaCo = localStorage.getItem("token");
+  if (dejaCo) {
+    window.location.href = "/profil";
+  }
+}, []);
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

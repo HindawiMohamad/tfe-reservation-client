@@ -64,7 +64,7 @@ function AvisRdv() {
   };
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "600px", margin: "auto" }}>
+    <div style={{ padding: "2rem", maxWidth: "600px", margin:"100px 0" }}>
       <h2>Votre avis sur l'artisan</h2>
 
       {avisExiste ? (

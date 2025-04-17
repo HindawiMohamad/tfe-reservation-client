@@ -5,6 +5,10 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { Link } from "react-router-dom";
 
+function getNomJour(date) {
+  const jours = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+  return jours[date.getDay()];
+}
 
 function ArtisanDetail() {
   const { id } = useParams();
@@ -19,6 +23,7 @@ function ArtisanDetail() {
   const [formData, setFormData] = useState({
     nom_client: "",
     email_client: "",
+    telephone_client: "",
     message: "",
     date_rdv: ""
   });
@@ -59,7 +64,13 @@ function ArtisanDetail() {
       });
 
       setSuccess(true);
-      setFormData({ nom_client: "", email_client: "", message: "", date_rdv: "" });
+
+      setCreneauxDispo(prev =>
+        prev.filter(c => c !== formData.date_rdv.split("T")[1].slice(0, 5))
+      );
+
+      setFormData({ nom_client: "", email_client: "", message: "", date_rdv: "", telephone_client: "" });
+
     } catch (err) {
       console.error("Erreur réservation :", err);
     }
@@ -67,24 +78,60 @@ function ArtisanDetail() {
 
   const chargerCreneaux = async (date) => {
     setSelectedDate(date);
-    const dateFormatee = date.toISOString().split('T')[0];
+
+    const jourSelectionne = getNomJour(date);
+    const disposDuJour = artisan.disponibilites.filter(d => d.jour === jourSelectionne);
+
+    const creneaux = [];
+
+    disposDuJour.forEach(d => {
+      const heureDebut = parseInt(d.heureDebut.split(":")[0], 10);
+      const heureFin = parseInt(d.heureFin.split(":")[0], 10);
+
+      for (let h = heureDebut; h < heureFin; h += 2) {
+        const heureFormatee = `${h.toString().padStart(2, "0")}:00`;
+        creneaux.push(heureFormatee);
+      }
+    });
 
     try {
-      const res = await axios.get(`http://localhost:5000/api/disponibilites/${id}/disponibilites-libres?date=${dateFormatee}`);
-      setCreneauxDispo(res.data.creneaux);
+      const resResa = await axios.get(`http://localhost:5000/api/reservations/artisan/${id}`);
+
+      // on prend la date au format YYYY-MM-DD
+      const dateStr = date.toISOString().split("T")[0];
+
+      // on extrait les heures réservées pour cette date
+      const heuresReservées = resResa.data
+        .filter(r => r.date_rdv.startsWith(dateStr))
+        .map(r => {
+          const heure = new Date(r.date_rdv).toLocaleTimeString("fr-FR", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+            timeZone: "Europe/Brussels", // pour corriger le décalage !
+          });
+          return heure;
+        });
+
+      const disposRestants = creneaux.filter(c => !heuresReservées.includes(c));
+      setCreneauxDispo(disposRestants);
     } catch (err) {
-      console.error("Erreur chargement créneaux :", err);
-      setCreneauxDispo([]);
+      console.error("Erreur chargement réservations :", err);
+      setCreneauxDispo(creneaux);
     }
   };
+
+
+
+
 
   if (loading) return <p>Chargement...</p>;
   if (!artisan) return <p>Artisan introuvable 😢</p>;
 
   return (
-    <div style={{ padding: "1rem" }}>
-     <Link to="/artisans">
-             <button style={{ marginBottom: "1rem" }}>← Retour à la liste</button>
+    <div style={{ padding: "1rem", margin:"100px 0"  }}>
+      <Link to="/artisans">
+        <button style={{ marginBottom: "1rem" }}>← Retour à la liste</button>
       </Link>
       <h2>{artisan.nom}</h2>
       <p><strong>Métier :</strong> {artisan.métier}</p>
@@ -95,16 +142,19 @@ function ArtisanDetail() {
       {artisan.photos && artisan.photos.length > 0 && (
         <div>
           <h3>Photos de ses interventions 📸</h3>
-          {artisan.photos.map((photoUrl, index) => (
-            <img
-              key={index}
-              src={`http://localhost:5000${photoUrl}`}
-              alt="Intervention artisan"
-              style={{ width: "200px", marginRight: "10px", marginBottom: "10px" }}
-            />
-          ))}
+          <div className="galerie">
+            {artisan.photos.map((photoUrl, index) => (
+              <div key={index} className="galerie-item">
+                <img
+                  src={`http://localhost:5000${photoUrl}`} // ✅ comme avant
+                  alt={`Photo ${index + 1}`}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
+
 
       <hr />
 
@@ -120,7 +170,7 @@ function ArtisanDetail() {
             <p><strong>Commentaire :</strong> {a.commentaire || "Pas de message"}</p>
           </div>
         ))
-        
+
       )}
 
       <hr />
@@ -133,7 +183,23 @@ function ArtisanDetail() {
         <>
           <div style={{ marginTop: "1rem" }}>
             <h4>Sélectionne une date 📅</h4>
-            <Calendar onChange={chargerCreneaux} value={selectedDate} />
+            <Calendar
+              onChange={chargerCreneaux}
+              value={selectedDate}
+              tileDisabled={({ date }) => {
+                const nomJour = getNomJour(date);
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // 🔒 on ignore l’heure
+
+                return (
+                  date <= today || // ❌ date passée ou aujourd’hui
+                  !artisan.disponibilites.some(d => d.jour === nomJour) // ❌ jour non dispo
+                );
+              }}
+
+            />
+
           </div>
 
           {selectedDate && (
@@ -146,7 +212,19 @@ function ArtisanDetail() {
                   {creneauxDispo.map((c, index) => (
                     <li key={index}>
                       <button
-                        onClick={() => setFormData({ ...formData, date_rdv: `${selectedDate.toISOString().split('T')[0]}T${c}` })}
+                        onClick={() => {
+                          const year = selectedDate.getFullYear();
+                          const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
+                          const day = String(selectedDate.getDate()).padStart(2, "0");
+
+                          const dateStr = `${year}-${month}-${day}`;
+                          setFormData({
+                            ...formData,
+                            date_rdv: `${dateStr}T${c}`
+                          });
+                        }}
+
+
                       >
                         {c}
                       </button>
@@ -158,23 +236,35 @@ function ArtisanDetail() {
           )}
 
           <form onSubmit={envoyerReservation} style={{ marginTop: "1rem" }}>
+            <p>Veuillez indiquer des coordonnées valables car l'artisan vous contactera dans les 24 heures pour confirmer la résérvation. S'il ne parvient pas a vous joindre votre résérvation sera annulée.</p>
             <input
               type="text"
               name="nom_client"
-              placeholder="Votre nom"
+              placeholder="Votre nom et prénom"
               value={formData.nom_client}
               onChange={handleChange}
               required
-            /><br /><br />
+            /><br />
 
             <input
               type="email"
               name="email_client"
-              placeholder="Votre email"
+              placeholder="Votre email*"
               value={formData.email_client}
               onChange={handleChange}
               required
-            /><br /><br />
+            />
+            <br />
+
+            <input
+              type="tel"
+              name="telephone_client"
+              placeholder="Votre numéro de téléphone*"
+              value={formData.telephone_client}
+              onChange={handleChange}
+              required
+            /><br />
+
 
             <input
               type="datetime-local"
@@ -182,21 +272,22 @@ function ArtisanDetail() {
               value={formData.date_rdv}
               onChange={handleChange}
               required
-            /><br /><br />
+            /><br />
 
             <textarea
               name="message"
               placeholder="Votre message (optionnel)"
               value={formData.message}
               onChange={handleChange}
-            ></textarea><br /><br />
-
+            ></textarea>
+            <p>*Champs obligatoire.</p>
+            {success && <p style={{ color: "green" }}>✅ Demande envoyée ! </p>}
             <button type="submit">Envoyer la demande</button>
           </form>
         </>
       )}
 
-      {success && <p style={{ color: "green" }}>✅ Demande envoyée !</p>}
+
     </div>
   );
 }

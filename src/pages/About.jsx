@@ -1,6 +1,6 @@
 function About() {
     return (
-      <div style={{ padding: "2rem", maxWidth: "900px", margin: "50px auto" }}>
+      <div style={{ padding: "2rem", maxWidth: "900px", margin:"100px Auto" }}>
         <h2>🎯 Le but du site</h2>
         <p>
           ArtisanConnect est une plateforme qui met en relation des particuliers avec des artisans qualifiés dans leur région. 
